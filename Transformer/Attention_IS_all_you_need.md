@@ -1,3 +1,13 @@
+## 论文阅读顺序
+1. 标题 + 作者
+2. 摘要
+3. 结论
+4. 导言
+5. 相关工作
+6. 模型
+7. 实验
+8. 评论
+
 # Attention is all you need
 ## Paper Reading
 
@@ -63,25 +73,40 @@ x表示你的词语，z表示x这个词语的向量表示，这就是你的编�
 - 这个图基本上就是transformer的图，但是这个图直接看应该看不懂，很难。
 
 
-如果是中文翻英文的话，inputs就是中文的句子，解码器在做预测的时候是没有输入的，output一个一个往后移。
+> 如果是中文翻英文的话，inputs就是中文的句子，解码器在做预测的时候是没有输入的，output一个一个往后移。
 
-Nx就是核心的block，也是一个transformer block。具体进去看的话有一个multi-head attentation,再加上一个MLP，中间有一些残差连接。
+> Nx就是核心的block，也是一个transformer block。具体进去看的话有一个multi-head attentation,再加上一个MLP，中间有一些残差连接。
 encoder的输出也就输入到了decoder，在中间，这个很有意思。
 多了一个masked multi-head attention.
 
-首先他介绍了encoder。
-完全一样的层，有6个，每个layer里面都有一个子层，
-simple就是一个MLP, 每个子层都用了残差连接。最后在使用了一个layernorm。因为残差连接的输入和输出必须是同样的大小，如果不一样就要投影，为了简单起见，每一个层的输出的维度变成512。这和CNN不一样，维度减少，channel往上拉。这个模型也是比较简单的。调参数也是比较简单的，也就N和维度可以调整的。gpt和bert也就这两个可以调整。能够花几句话讲清楚是不错的。
+> 首先他介绍了encoder。
+> 完全一样的层，有6个，每个layer里面都有一个子层，
+> simple就是一个MLP, 每个子层都用了残差连接。最后在使用了一个layernorm。因为残差连接的输入和输出必须是同样的大小，如果不一样就要投影，为了简单起见，每一个层的输出的维度变成512。这和CNN不一样，维度减少，channel往上拉。这个模型也是比较简单的。调参数也是比较简单的，也就N和维度可以调整的。gpt和bert也就这两个可以调整。能够花几句话讲清楚是不错的。
 
 - 为什么不使用batch norm
 
 <img src="./picture/transformer_8.png" width="400px" alt="Layer vs. Batch Normalization"/>
 - 算均值和方差上面。
-batchnorm是对全局来算。
-Layer norm是在每个feature上进行算。所以波动没有那么大。
+batchnorm是对全局来算平均和方差，蓝色的部分，像切了一到，均值为0，方差为1.如果碰到很长的数据，之前算的时候就没有见过。
+Layer norm，黄色部分。是在每个feature，每一个单独的数据上进行算平均和方差。所以波动没有那么大。
+上面的都是paper里面的解释，后来虽然有人来解释layer norm有效，是由于梯度。
 
-后来有人来解释是由于梯度。
 
+- 解码器
+> 在解码器训练的时候，你在t时候看到的数据后不能看到t之后所有的输出。这是来保证训练的时候输入和输出是一致的。模型里面对应的是Masked Multi-head attention.
+
+- Attention
+> query, keys, values. output是value的加权和。对于每一个value权重，是根据value对应的key，和查询这个query的相似度来算的。不同的注意力机制有不同的算法。
+
+- transformer用到的注意力机制
+> 两个向量做内积，如果内积越大，余弦值越大，相似度越高。如果是0就是正交，就不相似。
+> 由于实际一个一个算很慢，所以它除了一个dk
+> 由于是矩阵乘法，所以很容易并行
+
+之后他说他的注意力和其他的不同。一般有加性注意力，可以处理不同长度的情况。点积是本论文使用的。
+
+- multi head attention
+> 
 ### 7. 实验
 *内容待补充*
 
